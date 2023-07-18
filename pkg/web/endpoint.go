@@ -1,8 +1,10 @@
 package web
 
 import (
+	"bytes"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"path/filepath"
 
@@ -87,20 +89,32 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+
+	// Support raw files
 	if r.Method == http.MethodGet && e.IsFile() {
 		io.Copy(w, e.File())
 		return
 	}
-	status, body, err := e.run(r.Method, r.Body)
+
+	// Run request
+	status, body, err := e.run(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Write response
 	w.WriteHeader(status)
 	w.Write(body)
 }
 
-func (e *Endpoint) run(method string, input io.Reader) (status int, body []byte, err error) {
+func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
+	method := r.Method
+	b, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		return http.StatusInternalServerError, nil, err
+	}
+	input := bytes.NewReader(b)
 	_, err = os.Stat(e.CodePath(method, "go"))
 	if err == nil {
 		return golang.Run(e.CodePath(method, "go"), input)
