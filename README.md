@@ -1,25 +1,32 @@
 # webmachine
 
-Webmachine is a [polygot](https://en.wikipedia.org/wiki/Polyglot_(computing)) web application framework written in Go.
+`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you easily create apps using multiple programming environments. 
 
-## Dependencies
+## PL Support
 
-For any programming language you plan to you use, make sure it's binary (i.e. `ruby`, `python3`) is available in $PATH.
-
-| File Name | Executable Name |
-| --- | --- |
-| main.go | go |
-| main.rb | ruby |
-| main.py | python3 |
-| main.js | node |
+- [x] Go
+- [x] Ruby
+- [x] Python
+- [x] JavaScript
+- [ ] TypeScript
 
 ## Install
 
 <!-- ### Via Go Toolchain -->
-
 ```bash
 go install github.com/mikerybka/webmachine@latest
 ```
+
+#### A note on dependencies
+
+For any programming language you plan to you use, make sure it's binary (i.e. `ruby`, `python3`) is available in $PATH.
+
+| Language | Executable Name |
+| --- | --- |
+| Go | go |
+| Ruby | ruby |
+| Python | python3 |
+| JavaScript | node |
 
 ## Usage
 
@@ -64,28 +71,16 @@ staticsite.com/privacy
 staticsite.com/terms
 ```
 
-#### Rules
+### Routing Logic
 
 The filesystem is organized such that there should be one file for each "route".
-A route is generally defined as HTTP Method + URL Path.
+A route is defined as HTTP Method + Hostname + URL Path.
 Dynamic paths are supported with path variables and the ":"-prefix naming.
 
 If a request routes to a file, only GET requests are allowed on that path and the file is served as-is.
 
-If the request routes to a folder instead, the child directory with the name matching the request's HTTP method is read.
+If the request routes to a folder, the child directory with the name matching the request's HTTP method is read.
 If that folder does not exist, 404.
 
-If it does, the directory is searched for a main.* file matching one of our supported environments.
+If it does, the directory is searched for a main.[go|rb|py|js] file (in that order).
 
-### Language Support
-
-- Go
-- Node.js (planned)
-- Python (planned)
-- Ruby (planned)
-
-<!-- ## Development -->
-
-<!-- ### Setup -->
-
-<!-- TODO -->
