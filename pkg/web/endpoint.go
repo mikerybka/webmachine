@@ -96,7 +96,7 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Run request
 	status, body, err := e.run(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error()+"\n\n"+string(body), http.StatusInternalServerError)
 		return
 	}
 
