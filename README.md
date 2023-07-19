@@ -1,6 +1,6 @@
 # webmachine
 
-`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you easily create apps using multiple programming languages. 
+`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create apps using multiple programming languages. 
 
 ## Programming Language Support
 
