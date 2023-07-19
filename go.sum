@@ -1,3 +1,5 @@
+github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8 h1:4obIhTUmejXtNoHZDKqO5Pog3LGrj+uVYvN04CvKD+A=
+github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8/go.mod h1:cfUnOBc6HUzZSYdGypqYqHJ1bVJmiWu4JydPs8kC1l8=
 golang.org/x/crypto v0.11.0 h1:6Ewdq3tDic1mg5xRO4milcWCfMVQhI4NkqWWvqejpuA=
 golang.org/x/crypto v0.11.0/go.mod h1:xgJhtzW8F9jGdVFWZESrid1U1bjeNy4zgy5cRr/CIio=
 golang.org/x/net v0.10.0 h1:X2//UzNDwYmtCLn7To6G58Wr6f5ahEAQgKNzv9Y951M=
