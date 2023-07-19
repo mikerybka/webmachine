@@ -4,12 +4,6 @@ WIP
 
 `webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create apps using multiple programming languages.
 
-#### A note on performance
-
-The performance of this system is inherently limited by the fact that each request must spawn a new process.
-You should not expect to see this server compete with native framworks as far as latency, throughput and memory efficiency are concerned.
-However, the system is also stateless and can be easily scaled horizontally.
-
 ## Programming Language Support
 
 - [x] Go
