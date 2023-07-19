@@ -1,10 +1,8 @@
 package web
 
 import (
-	"bytes"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"path/filepath"
 
@@ -110,18 +108,18 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 	method := r.Method
-	b, err := httputil.DumpRequest(r, true)
-	if err != nil {
-		return http.StatusInternalServerError, nil, err
-	}
-	input := bytes.NewReader(b)
-	_, err = os.Stat(e.CodePath(method, "go"))
+	input := r.Body
+
+	codePath := e.CodePath(method, "go")
+	_, err = os.Stat(codePath)
 	if err == nil {
-		return golang.Run(e.CodePath(method, "go"), input)
+		return golang.Run(codePath, input)
 	}
-	_, err = os.Stat(e.CodePath(method, "rb"))
+
+	codePath = e.CodePath(method, "rb")
+	_, err = os.Stat(codePath)
 	if err == nil {
-		return ruby.Run(e.CodePath(method, "rb"), input)
+		return ruby.Run(codePath, input)
 	}
 
 	return http.StatusMethodNotAllowed, []byte("method not allowed"), nil
