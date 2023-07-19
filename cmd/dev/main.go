@@ -11,7 +11,7 @@ func main() {
 
 	// Start server
 	go func() {
-		cmd := exec.Command("go", "run", "main.go", "--dir=.", "--port=4000")
+		cmd := exec.Command("go", "run", "main.go", "--dir=../apps", "--port=4000")
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		err := cmd.Start()
