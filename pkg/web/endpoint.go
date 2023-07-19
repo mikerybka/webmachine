@@ -6,8 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mikerybka/webmachine/pkg/golang"
-	"github.com/mikerybka/webmachine/pkg/ruby"
+	"github.com/mikerybka/webmachine/pkg/ffi"
 )
 
 type Endpoint struct {
@@ -113,13 +112,13 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 	codePath := e.CodePath(method, "go")
 	_, err = os.Stat(codePath)
 	if err == nil {
-		return golang.Run(codePath, input)
+		return ffi.Run(input, "go", "run", codePath)
 	}
 
 	codePath = e.CodePath(method, "rb")
 	_, err = os.Stat(codePath)
 	if err == nil {
-		return ruby.Run(codePath, input)
+		return ffi.Run(input, "ruby", codePath)
 	}
 
 	return http.StatusMethodNotAllowed, []byte("method not allowed"), nil

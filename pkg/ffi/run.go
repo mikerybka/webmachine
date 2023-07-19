@@ -1,4 +1,4 @@
-package golang
+package ffi
 
 import (
 	"io"
@@ -6,8 +6,8 @@ import (
 	"os/exec"
 )
 
-func Run(path string, input io.Reader) (status int, body []byte, err error) {
-	cmd := exec.Command("go", "run", path)
+func Run(input io.Reader, name string, args ...string) (status int, body []byte, err error) {
+	cmd := exec.Command(name, args...)
 	cmd.Stdin = input
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
