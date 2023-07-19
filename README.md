@@ -2,7 +2,7 @@
 
 `webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you easily create apps using multiple programming environments. 
 
-## PL Support
+## Programming Language Support
 
 - [x] Go
 - [x] Ruby
