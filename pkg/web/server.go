@@ -53,7 +53,7 @@ func (s *Server) Endpoint(path, method string) (*Endpoint, error) {
 			}
 
 			// Remember the catchall name
-			if entry.Name()[0] == '[' && entry.Name()[len(entry.Name())-1] == ']' {
+			if len(entry.Name()) > 2 && entry.Name()[0] == '_' && entry.Name()[1] == '_' {
 				catchall = entry.Name()
 			}
 

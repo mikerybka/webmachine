@@ -45,8 +45,7 @@ Arguments:
 
 The filesystem is organized such that there should be one file for each "route".
 A route is defined as HTTP Method + Hostname + URL Path.
-Dynamic paths are supported with path variables.
-The path segment starts with `[` and ends with `]` with the name of the path param in between.
+Dynamic paths are supported with path variables and the "__"-prefix naming.
 
 If a request routes to a file, only GET requests are allowed on that path and the file is served as-is.
 
