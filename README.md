@@ -1,6 +1,12 @@
 # webmachine
 
-`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create apps using multiple programming languages. 
+`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create apps using multiple programming languages.
+
+#### A note on performance
+
+The performance of this system is inherently limited by the fact that each request must spawn a new process.
+You should not expect to see this server compete with native framworks as far as latency, throughput and memory efficiency are concerned.
+However, the system is also stateless and can be easily scaled horizontally.
 
 ## Programming Language Support
 
@@ -84,3 +90,16 @@ If that folder does not exist, 404.
 
 If it does, the directory is searched for a main.[go|rb|py|js] file (in that order).
 
+### Handler Logic
+
+The handler interface is designed to be simple.
+Standard input is filled with the request body.
+Standard output is expected to contain the response body.
+
+The exit code indicates the response status.
+- If the exit code is 0: `200 OK`
+- If the exit code is 1XX, 2XX, 3XX, 4XX or 5XX, the response status is set to that code.
+
+Cookies and headers can be set through via Standard Error.
+
+URL and query params as well as request headers are encoded in the command with arguments like `--key=value`.
