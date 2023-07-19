@@ -43,6 +43,9 @@ Arguments:
 Here's an example directory setup.
 
 ```
+example.org/python/GET/main.py
+example.org/ruby/GET/main.rb
+example.org/node/GET/main.js
 dynamicsite.com/GET/main.go
 dynamicsite.com/favicon.ico
 dynamicsite.com/items/GET/main.go
