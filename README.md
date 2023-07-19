@@ -40,6 +40,7 @@ Arguments:
 - `email` (optional): The email to share with Let's Encrypt
 - `dir` (optional): The root directory to serve. Defaults to /etc/webmachine
 - `port` (optional): The port to listen on. Defaults to both 443 and 80. If a port is not provided, HTTPS is served on 443 and HTTP served on 80. If the port provided is 443, HTTPS is served on port 443. If any other port is provided, HTTP is served on that port.
+<!-- - `dev` (optional): Boolean. If provided, run the dev server. -->
 
 ### Routing Logic
 
