@@ -127,5 +127,11 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 		return ffi.Run(input, "python3", codePath)
 	}
 
+	codePath = e.CodePath(method, "js")
+	_, err = os.Stat(codePath)
+	if err == nil {
+		return ffi.Run(input, "node", codePath)
+	}
+
 	return http.StatusMethodNotAllowed, []byte("method not allowed"), nil
 }
