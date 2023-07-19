@@ -21,7 +21,7 @@ go install github.com/mikerybka/webmachine@latest
 
 #### A note on dependencies
 
-For any programming language you plan to you use, make sure it's binary (i.e. `ruby`, `python3`) is available in $PATH.
+For any programming language you plan to you use, make sure it's binary (i.e. `ruby`, `python3`) is available in `$PATH`.
 
 | Language | Executable Name |
 | --- | --- |
