@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -22,13 +23,39 @@ func (e *Endpoint) IsFile() bool {
 	if err != nil {
 		return false
 	}
-	return !fi.IsDir()
+	if fi.IsDir() {
+		fi, err = os.Stat(filepath.Join(e.Filepath, "index.html"))
+		if err != nil {
+			return false
+		}
+		if !fi.IsDir() {
+			return true
+		}
+		return false
+	}
+	return true
 }
 
 func (e *Endpoint) File() io.Reader {
+	fi, err := os.Stat(e.Filepath)
+	if err != nil {
+		return bytes.NewReader(nil)
+	}
+	if fi.IsDir() {
+		path := filepath.Join(e.Filepath, "index.html")
+		fi, err = os.Stat(path)
+		if fi.IsDir() {
+			return bytes.NewReader(nil)
+		}
+		f, err := os.Open(path)
+		if err != nil {
+			return bytes.NewReader(nil)
+		}
+		return f
+	}
 	f, err := os.Open(e.Filepath)
 	if err != nil {
-		panic(err)
+		return bytes.NewReader(nil)
 	}
 	return f
 }
