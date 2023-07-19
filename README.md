@@ -2,7 +2,7 @@ WIP
 
 # webmachine
 
-`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create apps using multiple programming languages.
+`webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create [polygot](https://en.wikipedia.org/wiki/Polyglot_(computing)) web applications.
 
 ## Programming Language Support
 
