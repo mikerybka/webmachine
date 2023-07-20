@@ -11,7 +11,8 @@ import (
 )
 
 type Server struct {
-	Dir string
+	Dir  string
+	Args map[string]string
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -59,20 +60,27 @@ func (s *Server) Endpoint(path, method string) (*Endpoint, error) {
 
 			// If there is an exact match
 			if entry.Name() == p[0] {
-				path := filepath.Join(s.Dir, entry.Name())
-				return (&Server{Dir: path}).Endpoint(paths.Join(p[1:]), method)
+				newDir := filepath.Join(s.Dir, entry.Name())
+				s := Server{Dir: newDir, Args: s.Args}
+				return s.Endpoint(paths.Join(p[1:]), method)
 			}
 		}
 
-		// Return the catchall, if there is one
 		if catchall != "" {
-			path := filepath.Join(s.Dir, catchall)
-			return (&Server{Dir: path}).Endpoint(paths.Join(p[1:]), method)
+			newDir := filepath.Join(s.Dir, catchall)
+			s := Server{Dir: newDir, Args: s.Args}
+
+			// Record the arg
+			key := catchall[1:]
+			value := p[0]
+			s.Args[key] = value
+
+			return s.Endpoint(paths.Join(p[1:]), method)
 		}
 
 		// If there is no catchall, 404
 		return nil, os.ErrNotExist
 	}
 
-	return &Endpoint{Filepath: s.Dir}, nil
+	return &Endpoint{Filepath: s.Dir, Args: s.Args}, nil
 }

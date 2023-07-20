@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 type Endpoint struct {
 	Filepath string
+	Args     map[string]string
 }
 
 func (e *Endpoint) CodePath(method, lang string) string {
@@ -136,28 +138,38 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 	method := r.Method
 	input := r.Body
 
-	codePath := e.CodePath(method, "go")
-	_, err = os.Stat(codePath)
-	if err == nil {
-		return ffi.Run(input, "go", "run", codePath)
+	// Turn args to string list
+	arglist := []string{}
+	for k, v := range e.Args {
+		arglist = append(arglist, fmt.Sprintf("--%s=%s", k, v))
 	}
 
-	codePath = e.CodePath(method, "rb")
-	_, err = os.Stat(codePath)
-	if err == nil {
-		return ffi.Run(input, "ruby", codePath)
+	cmdMap := map[string][]string{
+		"go":  {"go", "run"},
+		"rb":  {"ruby"},
+		"py":  {"python3"},
+		"js":  {"node"},
+		"ts":  {"bun"},
+		"tsx": {"bun"},
+		"jsx": {"bun"},
 	}
-
-	codePath = e.CodePath(method, "py")
-	_, err = os.Stat(codePath)
-	if err == nil {
-		return ffi.Run(input, "python3", codePath)
+	exts := []string{
+		"go",
+		"rb",
+		"py",
+		"js",
 	}
+	for _, ext := range exts {
+		codePath := e.CodePath(method, ext)
+		_, err = os.Stat(codePath)
+		if err == nil {
+			// Prepare command
+			c := append(cmdMap[ext], codePath)
+			c = append(c, arglist...)
 
-	codePath = e.CodePath(method, "js")
-	_, err = os.Stat(codePath)
-	if err == nil {
-		return ffi.Run(input, "node", codePath)
+			// Run command
+			return ffi.Run(input, c[0], c[1:]...)
+		}
 	}
 
 	return http.StatusMethodNotAllowed, []byte("method not allowed"), nil
