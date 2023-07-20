@@ -73,6 +73,9 @@ func (s *Server) Endpoint(path, method string) (*Endpoint, error) {
 			// Record the arg
 			key := catchall[1:]
 			value := p[0]
+			if s.Args == nil {
+				s.Args = map[string]string{}
+			}
 			s.Args[key] = value
 
 			return s.Endpoint(paths.Join(p[1:]), method)
