@@ -71,7 +71,7 @@ func (s *Server) Endpoint(path, method string) (*Endpoint, error) {
 			s := Server{Dir: newDir, Args: s.Args}
 
 			// Record the arg
-			key := catchall[1:]
+			key := catchall[2:]
 			value := p[0]
 			if s.Args == nil {
 				s.Args = map[string]string{}
