@@ -91,4 +91,6 @@ The exit code indicates the response status.
 
 Cookies and headers can be set through via Standard Error.
 
-URL and query params as well as request headers are encoded in the command with arguments like `--key=value`.
+URL and query params are encoded in the command with arguments like `--key=value`.
+
+Headers are converted to SCREAMING_SNAKE_CASE and passed as environment variables.
