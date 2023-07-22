@@ -158,6 +158,9 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 		"rb",
 		"py",
 		"js",
+		"ts",
+		"tsx",
+		"jsx",
 	}
 	for _, ext := range exts {
 		codePath := e.CodePath(method, ext)
@@ -172,5 +175,5 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 		}
 	}
 
-	return http.StatusMethodNotAllowed, []byte("method not allowed"), nil
+	return http.StatusNotFound, []byte("404 page not found"), nil
 }
