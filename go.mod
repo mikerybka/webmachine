@@ -1,6 +1,6 @@
 module github.com/mikerybka/webmachine
 
-go 1.21rc2
+go 1.20
 
 require (
 	github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8
