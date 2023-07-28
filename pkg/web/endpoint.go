@@ -138,9 +138,18 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 	method := r.Method
 	input := r.Body
 
+	// build args out of query params and args
+	args := map[string]string{}
+	for k, v := range e.Args {
+		args[k] = v
+	}
+	for k := range r.URL.Query() {
+		args[k] = r.URL.Query().Get(k)
+	}
+
 	// Turn args to string list
 	arglist := []string{}
-	for k, v := range e.Args {
+	for k, v := range args {
 		arglist = append(arglist, fmt.Sprintf("--%s=%s", k, v))
 	}
 
