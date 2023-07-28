@@ -37,6 +37,81 @@ func (e *Endpoint) IsFile() bool {
 	return true
 }
 
+func (e *Endpoint) ContentType() string {
+	fi, err := os.Stat(e.Filepath)
+	if err != nil {
+		return ""
+	}
+	if fi.IsDir() {
+		fi, err = os.Stat(filepath.Join(e.Filepath, "index.html"))
+		if err != nil {
+			return ""
+		}
+		if !fi.IsDir() {
+			return "text/html"
+		}
+		return ""
+	}
+	switch filepath.Ext(e.Filepath) {
+	case ".html":
+		return "text/html"
+	case ".css":
+		return "text/css"
+	case ".js":
+		return "text/javascript"
+	case ".json":
+		return "application/json"
+	case ".xml":
+		return "application/xml"
+	case ".pdf":
+		return "application/pdf"
+	case ".zip":
+		return "application/zip"
+	case ".tar":
+		return "application/x-tar"
+	case ".gz":
+		return "application/gzip"
+	case ".mp3":
+		return "audio/mpeg"
+	case ".wav":
+		return "audio/wav"
+	case ".mp4":
+		return "video/mp4"
+	case ".mov":
+		return "video/quicktime"
+	case ".avi":
+		return "video/x-msvideo"
+	case ".png":
+		return "image/png"
+	case ".jpg":
+		return "image/jpeg"
+	case ".jpeg":
+		return "image/jpeg"
+	case ".gif":
+		return "image/gif"
+	case ".svg":
+		return "image/svg+xml"
+	case ".ico":
+		return "image/x-icon"
+	case ".ttf":
+		return "font/ttf"
+	case ".otf":
+		return "font/otf"
+	case ".woff":
+		return "font/woff"
+	case ".woff2":
+		return "font/woff2"
+	case ".eot":
+		return "application/vnd.ms-fontobject"
+	case ".csv":
+		return "text/csv"
+	case ".txt":
+		return "text/plain"
+	default:
+		return "text/html"
+	}
+}
+
 func (e *Endpoint) File() io.Reader {
 	fi, err := os.Stat(e.Filepath)
 	if err != nil {
@@ -44,7 +119,7 @@ func (e *Endpoint) File() io.Reader {
 	}
 	if fi.IsDir() {
 		path := filepath.Join(e.Filepath, "index.html")
-		fi, err = os.Stat(path)
+		fi, _ = os.Stat(path)
 		if fi.IsDir() {
 			return bytes.NewReader(nil)
 		}
@@ -117,6 +192,7 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Support raw files
 	if r.Method == http.MethodGet && e.IsFile() {
+		w.Header().Set("Content-Type", e.ContentType())
 		io.Copy(w, e.File())
 		return
 	}
