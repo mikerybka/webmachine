@@ -14,8 +14,6 @@ func Run(header http.Header, body io.Reader, name string, args ...string) (statu
 	cmd.Env = os.Environ()
 	for k := range header {
 		key := k
-		// key = strings.ReplaceAll(k, "-", "_")
-		// key = strings.ToUpper(key)
 		value := header.Get(k)
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
 	}
