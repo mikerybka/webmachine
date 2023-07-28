@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 )
 
 func Run(header http.Header, body io.Reader, name string, args ...string) (status int, b []byte, err error) {
 	cmd := exec.Command(name, args...)
+	cmd.Env = os.Environ()
 	for k := range header {
 		key := strings.ReplaceAll(k, "-", "_")
 		key = strings.ToUpper(key)
