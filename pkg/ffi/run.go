@@ -6,11 +6,18 @@ import (
 	"io"
 	"net/http"
 	"os/exec"
+	"strings"
 )
 
-func Run(input io.Reader, name string, args ...string) (status int, body []byte, err error) {
+func Run(header http.Header, body io.Reader, name string, args ...string) (status int, b []byte, err error) {
 	cmd := exec.Command(name, args...)
-	cmd.Stdin = input
+	for k := range header {
+		key := strings.ReplaceAll(k, "-", "_")
+		key = strings.ToUpper(key)
+		value := header.Get(k)
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", key, value))
+	}
+	cmd.Stdin = body
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 	cmd.Stdout = stdout
@@ -39,7 +46,7 @@ func Run(input io.Reader, name string, args ...string) (status int, body []byte,
 		status = http.StatusInternalServerError
 	}
 
-	body = stdoutbytes
+	b = stdoutbytes
 
-	return status, body, nil
+	return status, b, nil
 }

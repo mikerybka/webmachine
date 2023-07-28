@@ -171,7 +171,7 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 			c = append(c, arglist...)
 
 			// Run command
-			return ffi.Run(input, c[0], c[1:]...)
+			return ffi.Run(r.Header, input, c[0], c[1:]...)
 		}
 	}
 
