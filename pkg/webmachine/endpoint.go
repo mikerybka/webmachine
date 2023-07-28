@@ -107,6 +107,8 @@ func (e *Endpoint) ContentType() string {
 		return "text/csv"
 	case ".txt":
 		return "text/plain"
+	case ".deb":
+		return "application/vnd.debian.binary-package"
 	default:
 		return "text/html"
 	}
