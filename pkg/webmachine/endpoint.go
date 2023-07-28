@@ -1,14 +1,13 @@
-package web
+package webmachine
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	"github.com/mikerybka/webmachine/pkg/ffi"
+	"github.com/mikerybka/webmachine/pkg/http2cli"
 )
 
 type Endpoint struct {
@@ -123,36 +122,10 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Run request
-	status, body, err := e.run(r)
-	if err != nil {
-		http.Error(w, err.Error()+"\n\n"+string(body), http.StatusInternalServerError)
-		return
-	}
-
-	// Write response
-	w.WriteHeader(status)
-	w.Write(body)
+	e.run(r).WriteTo(w)
 }
 
-func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
-	method := r.Method
-	input := r.Body
-
-	// build args out of query params and args
-	args := map[string]string{}
-	for k, v := range e.Args {
-		args[k] = v
-	}
-	for k := range r.URL.Query() {
-		args[k] = r.URL.Query().Get(k)
-	}
-
-	// Turn args to string list
-	arglist := []string{}
-	for k, v := range args {
-		arglist = append(arglist, fmt.Sprintf("--%s=%s", k, v))
-	}
-
+func (e *Endpoint) run(r *http.Request) *http2cli.Response {
 	cmdMap := map[string][]string{
 		"go":  {"go", "run"},
 		"rb":  {"ruby"},
@@ -172,17 +145,19 @@ func (e *Endpoint) run(r *http.Request) (status int, body []byte, err error) {
 		"jsx",
 	}
 	for _, ext := range exts {
-		codePath := e.CodePath(method, ext)
-		_, err = os.Stat(codePath)
+		codePath := e.CodePath(r.Method, ext)
+		_, err := os.Stat(codePath)
 		if err == nil {
 			// Prepare command
 			c := append(cmdMap[ext], codePath)
-			c = append(c, arglist...)
 
 			// Run command
-			return ffi.Run(r.Header, input, c[0], c[1:]...)
+			return http2cli.Exec(r, e.Args, c)
 		}
 	}
 
-	return http.StatusNotFound, []byte("404 page not found"), nil
+	return &http2cli.Response{
+		StatusCode: http.StatusNotFound,
+		Body:       []byte("not found"),
+	}
 }

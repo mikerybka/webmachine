@@ -5,7 +5,7 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/mikerybka/webmachine/pkg/web"
+	"github.com/mikerybka/webmachine/pkg/webmachine"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	certDir := flag.String("cert-dir", "/etc/webmachine/certs", "The directory to store certificates in.")
 	port := flag.String("port", "", "The port to listen on. Defaults to both 443 and 80. If a port is not provided, HTTPS is served on 443 and HTTP served on 80. If the port provided is 443, HTTPS is served on port 443. If any other port is provided, HTTP is served on that port.")
 	flag.Parse()
-	server := web.Server{
+	server := webmachine.Server{
 		Dir: *dir,
 	}
 	var err error
