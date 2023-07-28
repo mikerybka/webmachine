@@ -122,10 +122,10 @@ func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Run request
-	e.run(r).WriteTo(w)
+	e.Run(r).WriteTo(w)
 }
 
-func (e *Endpoint) run(r *http.Request) *http2cli.Response {
+func (e *Endpoint) Run(r *http.Request) *http2cli.Response {
 	cmdMap := map[string][]string{
 		"go":  {"go", "run"},
 		"rb":  {"ruby"},
