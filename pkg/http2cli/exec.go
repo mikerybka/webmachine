@@ -43,11 +43,6 @@ func Exec(r *http.Request, pathArgs map[string]string, command []string) *Respon
 	cmd.Stdin = r.Body
 
 	// Run command
-	return Run(cmd)
-}
-
-func Run(cmd *exec.Cmd) *Response {
-	// Run command
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 	cmd.Stdout = stdout
