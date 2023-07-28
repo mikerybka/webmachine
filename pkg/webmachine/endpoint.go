@@ -152,7 +152,7 @@ func (e *Endpoint) Run(r *http.Request) *http2cli.Response {
 			c := append(cmdMap[ext], codePath)
 
 			// Run command
-			return http2cli.Exec(r, e.Args, c)
+			return http2cli.Exec(r, c, e.Args)
 		}
 	}
 

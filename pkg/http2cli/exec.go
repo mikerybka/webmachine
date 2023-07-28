@@ -8,7 +8,7 @@ import (
 	"os/exec"
 )
 
-func Exec(r *http.Request, pathArgs map[string]string, command []string) *Response {
+func Exec(r *http.Request, command []string, pathArgs map[string]string) *Response {
 	if len(command) == 0 {
 		panic("no command")
 	}
