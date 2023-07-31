@@ -11,12 +11,17 @@ import (
 )
 
 type Server struct {
-	Dir  string
-	Args map[string]string
+	Dir     string
+	Args    map[string]string
+	DevMode bool
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(r.Host, r.URL.Path)
+
+	if s.DevMode {
+		path = r.URL.Path[1:]
+	}
 
 	// Log the request
 	fmt.Println(r.Method, path)
