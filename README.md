@@ -4,19 +4,11 @@ WIP
 
 `webmachine` is a filesystem-based HTTP router that aims to support all of your favourite programming languages allowing you to easily create [polygot](https://en.wikipedia.org/wiki/Polyglot_(computing)) web applications.
 
-## Programming Language Support
-
-- [x] Go
-- [x] Ruby
-- [x] Python
-- [x] JavaScript
-- [ ] TypeScript
-
 ## Install
 
 <!-- ### Via Go Toolchain -->
 ```bash
-go install github.com/mikerybka/webmachine@latest
+go install github.com/mikerybka/webmachine/bin/webmachine@latest
 ```
 
 #### A note on dependencies
@@ -29,11 +21,12 @@ For any programming language you plan to you use, make sure it's binary (i.e. `r
 | Ruby | ruby |
 | Python | python3 |
 | JavaScript | node |
+| TypeScript | bun |
 
 ## Usage
 
 ```
-webmachine serve [arguments]
+webmachine [arguments]
 ```
 
 Arguments:
@@ -66,9 +59,9 @@ dynamicsite.com/favicon.ico
 dynamicsite.com/items/GET/main.go
 dynamicsite.com/items/POST/main.go
 dynamicsite.com/items/new/GET/main.go
-dynamicsite.com/items/:itemID/GET/main.go
-dynamicsite.com/items/:itemID/PUT/main.go
-dynamicsite.com/items/:itemID/DELETE/main.go
+dynamicsite.com/items/__itemID/GET/main.go
+dynamicsite.com/items/__itemID/PUT/main.go
+dynamicsite.com/items/__itemID/DELETE/main.go
 staticsite.com/index.html
 staticsite.com/products
 staticsite.com/services
