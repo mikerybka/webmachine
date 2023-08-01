@@ -138,54 +138,6 @@ func (e *Endpoint) File() io.Reader {
 	return f
 }
 
-func (e *Endpoint) GoGET() string {
-	path := filepath.Join(e.Filepath, "GET/main.go")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) GoPOST() string {
-	path := filepath.Join(e.Filepath, "POST/main.go")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) GoPUT() string {
-	path := filepath.Join(e.Filepath, "PUT/main.go")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) GoDELETE() string {
-	path := filepath.Join(e.Filepath, "DELETE/main.go")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) RubyGET() string {
-	path := filepath.Join(e.Filepath, "GET/main.rb")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) RubyPOST() string {
-	path := filepath.Join(e.Filepath, "POST/main.rb")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) RubyPUT() string {
-	path := filepath.Join(e.Filepath, "PUT/main.rb")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
-func (e *Endpoint) RubyDELETE() string {
-	path := filepath.Join(e.Filepath, "DELETE/main.rb")
-	b, _ := os.ReadFile(path)
-	return string(b)
-}
-
 func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if e == nil {
 		http.NotFound(w, r)
