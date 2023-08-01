@@ -11,8 +11,8 @@ import (
 
 func main() {
 	email := flag.String("email", "", "The email to share with Let's Encrypt.")
-	dir := flag.String("dir", "/etc/webmachine", "The root directory to serve.")
-	certDir := flag.String("cert-dir", "/etc/webmachine/certs", "The directory to store certificates in.")
+	dir := flag.String("dir", "/etc/web", "The root directory to serve.")
+	certDir := flag.String("cert-dir", "/etc/web/certs", "The directory to store certificates in.")
 	port := flag.String("port", "", "The port to listen on. Defaults to both 443 and 80. If a port is not provided, HTTPS is served on 443 and HTTP served on 80. If the port provided is 443, HTTPS is served on port 443. If any other port is provided, HTTP is served on that port.")
 	devMode := flag.Bool("dev", false, "Run in development mode. This will serve files from the root directory instead of the subdomain directory.")
 	flag.Parse()
