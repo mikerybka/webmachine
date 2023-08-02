@@ -4,37 +4,71 @@ import (
 	"context"
 	"flag"
 	"net/http"
+	"os"
+	"os/exec"
 
 	"github.com/mikerybka/webmachine/pkg/webmachine"
+	"github.com/pkg/browser"
 	"golang.org/x/crypto/acme/autocert"
 )
 
+func usage() {}
+
 func main() {
-	email := flag.String("email", "", "The email to share with Let's Encrypt.")
-	dir := flag.String("dir", "/etc/web", "The root directory to serve.")
-	certDir := flag.String("cert-dir", "/etc/web/certs", "The directory to store certificates in.")
-	port := flag.String("port", "", "The port to listen on. Defaults to both 443 and 80. If a port is not provided, HTTPS is served on 443 and HTTP served on 80. If the port provided is 443, HTTPS is served on port 443. If any other port is provided, HTTP is served on that port.")
-	devMode := flag.Bool("dev", false, "Run in development mode. This will serve files from the root directory instead of the subdomain directory.")
+	var dir string
+	flag.StringVar(&dir, "dir", ".", "Use this directory as the root of the web server")
 	flag.Parse()
-	server := webmachine.Server{
-		Dir:     *dir,
-		DevMode: *devMode,
-	}
-	var err error
-	if *port == "" {
-		err = serveTLS(&server, *email, *certDir)
-	} else {
-		err = http.ListenAndServe(":"+*port, &server)
-	}
-	if err != nil {
-		panic(err)
+	command := flag.Arg(0)
+	switch command {
+	case "dev":
+		server := webmachine.Server{
+			Dir:     dir,
+			DevMode: true,
+		}
+		browser.OpenURL("http://localhost:3000")
+		err := http.ListenAndServe(":3000", &server)
+		if err != nil {
+			panic(err)
+		}
+		return
+	case "deploy":
+		cmd := exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "/etc/web/")
+
+		remoteHostname := flag.Arg(1)
+		if remoteHostname != "" {
+			cmd = exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "root@"+remoteHostname+":/etc/web/")
+		}
+
+		cmd.Env = os.Environ()
+		cmd.Dir = dir
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
+		if err != nil {
+			panic(err)
+		}
+		return
+	case "serve":
+		server := webmachine.Server{
+			Dir: "/etc/web",
+		}
+		var email string
+		if len(os.Args) >= 3 {
+			email = os.Args[2]
+		}
+		err := serveHTTPS(&server, email, "/etc/web/certs")
+		if err != nil {
+			panic(err)
+		}
+	default:
+		usage()
 	}
 }
 
 // Use Let's Encrypt to fetch and renew certificates on any domain.
-// serveTLS binds to ports 80 and 443 and serves the given handler.
+// serveHTTPS binds to ports 80 and 443 and serves the given handler.
 // It uses a special handler for port 80 that can handle ACME challenges.
-func serveTLS(s http.Handler, email, certDir string) error {
+func serveHTTPS(s http.Handler, email, certDir string) error {
 	// Create a channel to receive errors from the HTTP servers.
 	errChan := make(chan error)
 
