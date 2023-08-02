@@ -56,7 +56,7 @@ func main() {
 		if len(os.Args) >= 3 {
 			email = os.Args[2]
 		}
-		err := serveHTTPS(&server, email, "/etc/web/certs")
+		err := serveHTTPS(&server, email, "/etc/certs")
 		if err != nil {
 			panic(err)
 		}
