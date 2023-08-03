@@ -58,6 +58,11 @@ func (s *Server) endpoint(path, method string) (*Endpoint, error) {
 				continue
 			}
 
+			// Ignore HTTP method directories
+			if entry.Name() == "GET" || entry.Name() == "POST" || entry.Name() == "PUT" || entry.Name() == "DELETE" {
+				continue
+			}
+
 			// Remember the catchall name
 			if len(entry.Name()) > 2 && entry.Name()[0] == '_' && entry.Name()[1] == '_' {
 				catchall = entry.Name()
