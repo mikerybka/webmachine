@@ -165,7 +165,7 @@ func (e *Endpoint) execResponse(r *types.Request) *types.Response {
 		resp.Status = exitCode
 	} else {
 		resp.Status = 500
-		resp.Body = stderr.Bytes()
+		resp.Body = append(stderr.Bytes(), stdout.Bytes()...)
 	}
 
 	return resp
