@@ -95,5 +95,5 @@ func (s *Server) endpoint(path, method string) (*Endpoint, error) {
 		return nil, os.ErrNotExist
 	}
 
-	return &Endpoint{Filepath: s.Dir, Args: s.Args}, nil
+	return &Endpoint{Filepath: s.Dir, PathParams: s.Args}, nil
 }

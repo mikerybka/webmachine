@@ -2,9 +2,11 @@ package webmachine
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/mikerybka/web/util"
@@ -13,8 +15,8 @@ import (
 )
 
 type Endpoint struct {
-	Filepath string
-	Args     map[string]string
+	Filepath   string
+	PathParams map[string]string
 }
 
 func (e *Endpoint) Handle(req *types.Request) *types.Response {
@@ -103,7 +105,70 @@ func (e *Endpoint) file() io.Reader {
 }
 
 func (e *Endpoint) execResponse(r *types.Request) *types.Response {
-	return e.runtime(r.Method).Handle(r)
+	rt := e.runtime(r.Method)
+
+	// build params out of query params and path params
+	params := map[string]string{}
+	for k, v := range r.QueryParams {
+		params[k] = v
+	}
+	for k, v := range e.PathParams {
+		params[k] = v
+	}
+
+	// Build command
+	command := []string{}
+	for k, v := range params {
+		command = append(command, fmt.Sprintf("--%s=%s", k, v))
+	}
+	path := filepath.Join(e.Filepath, r.Method, rt.FileName)
+	command = append([]string{path}, command...)
+	command = append(rt.CmdPrefix, command...)
+
+	// Run command
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Stdin = bytes.NewReader(r.Body)
+	cmd.Env = os.Environ()
+	for k, v := range r.Headers {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
+	}
+	stdout := bytes.NewBuffer(nil)
+	stderr := bytes.NewBuffer(nil)
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+	cmd.Run()
+
+	// Build response
+	resp := types.NewResponse(r)
+
+	// Add headers
+	resp.Body = stdout.Bytes()
+	for _, line := range bytes.Split(stdout.Bytes(), []byte("\n")) {
+		if len(line) == 0 {
+			break
+		}
+		parts := bytes.SplitN(line, []byte(":"), 2)
+		if len(parts) != 2 {
+			continue
+		}
+		resp.Headers[string(parts[0])] = string(parts[1])
+	}
+
+	// Add body
+	resp.Body = stdout.Bytes()
+
+	// Add status code
+	exitCode := cmd.ProcessState.ExitCode()
+	if exitCode == 0 {
+		resp.Status = 200
+	} else if exitCode >= 100 && exitCode < 600 {
+		resp.Status = exitCode
+	} else {
+		resp.Status = 500
+		resp.Body = stderr.Bytes()
+	}
+
+	return resp
 }
 
 func (e *Endpoint) runtime(method string) *types.Runtime {
