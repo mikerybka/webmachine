@@ -159,14 +159,13 @@ func (e *Endpoint) execResponse(r *types.Request) *types.Response {
 
 	// Add status code
 	exitCode := cmd.ProcessState.ExitCode()
-	if exitCode == 0 {
-		resp.Status = 200
-	} else if exitCode >= 100 && exitCode < 600 {
-		resp.Status = exitCode
-	} else {
+	status, ok := data.ExitCodes[exitCode]
+	if !ok {
 		resp.Status = 500
 		resp.Body = append(stderr.Bytes(), stdout.Bytes()...)
+		return resp
 	}
+	resp.Status = status
 
 	return resp
 }
