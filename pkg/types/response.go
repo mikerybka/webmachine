@@ -32,6 +32,10 @@ func (r *Response) Log(w io.Writer) {
 }
 
 func (r *Response) Write(w http.ResponseWriter) {
+	if r == nil {
+		return
+	}
+
 	for k, v := range r.Headers {
 		w.Header().Set(k, v)
 	}
