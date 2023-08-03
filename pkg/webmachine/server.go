@@ -16,15 +16,11 @@ type Server struct {
 	DevMode bool
 }
 
-func (s *Server) Serve() error {
-	return http.ListenAndServe(":3000", s)
-}
-
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req := types.NewRequest(r)
 	req.Log(os.Stdout)
-	path := s.getPath(r)
-	endpoint, err := s.FindEndpoint(path, r.Method)
+	path := s.path(r)
+	endpoint, err := s.endpoint(path, r.Method)
 	if errors.Is(err, os.ErrNotExist) {
 		http.NotFound(w, r)
 		return
@@ -32,10 +28,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	endpoint.ServeHTTP(w, r)
+	res := endpoint.Handle(req)
+	res.Write(w)
+	res.Log(os.Stdout)
 }
 
-func (s *Server) getPath(r *http.Request) string {
+func (s *Server) path(r *http.Request) string {
 	path := filepath.Join(r.Host, r.URL.Path)
 	if s.DevMode {
 		path = r.URL.Path[1:]
@@ -43,7 +41,7 @@ func (s *Server) getPath(r *http.Request) string {
 	return path
 }
 
-func (s *Server) FindEndpoint(path, method string) (*Endpoint, error) {
+func (s *Server) endpoint(path, method string) (*Endpoint, error) {
 	p := paths.Parse(path)
 
 	// If this is not the root endpoint, find the next directory to work from and trim the path
@@ -69,7 +67,7 @@ func (s *Server) FindEndpoint(path, method string) (*Endpoint, error) {
 			if entry.Name() == p[0] {
 				newDir := filepath.Join(s.Dir, entry.Name())
 				s := Server{Dir: newDir, Args: s.Args}
-				return s.FindEndpoint(paths.Join(p[1:]), method)
+				return s.endpoint(paths.Join(p[1:]), method)
 			}
 		}
 
@@ -85,7 +83,7 @@ func (s *Server) FindEndpoint(path, method string) (*Endpoint, error) {
 			}
 			s.Args[key] = value
 
-			return s.FindEndpoint(paths.Join(p[1:]), method)
+			return s.endpoint(paths.Join(p[1:]), method)
 		}
 
 		// If there is no catchall, 404

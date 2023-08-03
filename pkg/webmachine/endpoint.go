@@ -7,7 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mikerybka/webmachine/pkg/http2cli"
+	"github.com/mikerybka/web/util"
+	"github.com/mikerybka/webmachine/pkg/data"
+	"github.com/mikerybka/webmachine/pkg/types"
 )
 
 type Endpoint struct {
@@ -15,11 +17,25 @@ type Endpoint struct {
 	Args     map[string]string
 }
 
-func (e *Endpoint) CodePath(method, lang string) string {
-	return filepath.Join(e.Filepath, method, "main."+lang)
+func (e *Endpoint) Handle(req *types.Request) *types.Response {
+	if req.Method == http.MethodGet && e.isFile() {
+		return e.fileResponse(req)
+	}
+	return e.execResponse(req)
 }
 
-func (e *Endpoint) IsFile() bool {
+func (e *Endpoint) fileResponse(r *types.Request) *types.Response {
+	res := types.NewResponse(r)
+	res.Headers["Content-Type"] = e.contentType()
+	b, err := io.ReadAll(e.file())
+	if err != nil {
+		panic(err)
+	}
+	res.Body = b
+	return res
+}
+
+func (e *Endpoint) isFile() bool {
 	fi, err := os.Stat(e.Filepath)
 	if err != nil {
 		return false
@@ -37,84 +53,32 @@ func (e *Endpoint) IsFile() bool {
 	return true
 }
 
-func (e *Endpoint) ContentType() string {
+func (e *Endpoint) contentType() string {
 	fi, err := os.Stat(e.Filepath)
 	if err != nil {
 		return ""
 	}
+
 	if fi.IsDir() {
 		fi, err = os.Stat(filepath.Join(e.Filepath, "index.html"))
 		if err != nil {
 			return ""
 		}
-		if !fi.IsDir() {
-			return "text/html"
+		if fi.IsDir() {
+			return ""
 		}
-		return ""
-	}
-	switch filepath.Ext(e.Filepath) {
-	case ".html":
 		return "text/html"
-	case ".css":
-		return "text/css"
-	case ".js":
-		return "text/javascript"
-	case ".json":
-		return "application/json"
-	case ".xml":
-		return "application/xml"
-	case ".pdf":
-		return "application/pdf"
-	case ".zip":
-		return "application/zip"
-	case ".tar":
-		return "application/x-tar"
-	case ".gz":
-		return "application/gzip"
-	case ".mp3":
-		return "audio/mpeg"
-	case ".wav":
-		return "audio/wav"
-	case ".mp4":
-		return "video/mp4"
-	case ".mov":
-		return "video/quicktime"
-	case ".avi":
-		return "video/x-msvideo"
-	case ".png":
-		return "image/png"
-	case ".jpg":
-		return "image/jpeg"
-	case ".jpeg":
-		return "image/jpeg"
-	case ".gif":
-		return "image/gif"
-	case ".svg":
-		return "image/svg+xml"
-	case ".ico":
-		return "image/x-icon"
-	case ".ttf":
-		return "font/ttf"
-	case ".otf":
-		return "font/otf"
-	case ".woff":
-		return "font/woff"
-	case ".woff2":
-		return "font/woff2"
-	case ".eot":
-		return "application/vnd.ms-fontobject"
-	case ".csv":
-		return "text/csv"
-	case ".txt":
+	}
+
+	contentType, ok := data.ContentTypes[filepath.Ext(e.Filepath)]
+	if !ok {
 		return "text/plain"
-	case ".deb":
-		return "application/vnd.debian.binary-package"
-	default:
-		return "text/html"
 	}
+
+	return contentType
 }
 
-func (e *Endpoint) File() io.Reader {
+func (e *Endpoint) file() io.Reader {
 	fi, err := os.Stat(e.Filepath)
 	if err != nil {
 		return bytes.NewReader(nil)
@@ -138,56 +102,16 @@ func (e *Endpoint) File() io.Reader {
 	return f
 }
 
-func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if e == nil {
-		http.NotFound(w, r)
-		return
-	}
-
-	// Support raw files
-	if r.Method == http.MethodGet && e.IsFile() {
-		w.Header().Set("Content-Type", e.ContentType())
-		io.Copy(w, e.File())
-		return
-	}
-
-	// Run request
-	e.Run(r).WriteTo(w)
+func (e *Endpoint) execResponse(r *types.Request) *types.Response {
+	return e.runtime(r.Method).Handle(r)
 }
 
-func (e *Endpoint) Run(r *http.Request) *http2cli.Response {
-	cmdMap := map[string][]string{
-		"go":  {"go", "run"},
-		"rb":  {"ruby"},
-		"py":  {"python3"},
-		"js":  {"node"},
-		"ts":  {"bun"},
-		"tsx": {"bun"},
-		"jsx": {"bun"},
-	}
-	exts := []string{
-		"go",
-		"rb",
-		"py",
-		"js",
-		"ts",
-		"tsx",
-		"jsx",
-	}
-	for _, ext := range exts {
-		codePath := e.CodePath(r.Method, ext)
-		_, err := os.Stat(codePath)
-		if err == nil {
-			// Prepare command
-			c := append(cmdMap[ext], codePath)
-
-			// Run command
-			return http2cli.Exec(r, c, e.Args)
+func (e *Endpoint) runtime(method string) *types.Runtime {
+	for _, runtime := range data.Runtimes {
+		handlerFile := filepath.Join(e.Filepath, method, runtime.FileName)
+		if util.FileExists(handlerFile) {
+			return &runtime
 		}
 	}
-
-	return &http2cli.Response{
-		StatusCode: http.StatusNotFound,
-		Body:       []byte("not found"),
-	}
+	return nil
 }
