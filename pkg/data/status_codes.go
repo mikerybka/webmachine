@@ -2,6 +2,7 @@ package data
 
 var StatusCodes = []int{
 	200,
+	500,
 	100,
 	101,
 	102,

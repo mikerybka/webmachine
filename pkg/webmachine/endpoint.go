@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/mikerybka/web/util"
 	"github.com/mikerybka/webmachine/pkg/data"
@@ -140,9 +142,6 @@ func (e *Endpoint) execResponse(r *types.Request) *types.Response {
 
 	// Build response
 	resp := types.NewResponse(r)
-
-	// Add headers
-	resp.Body = stdout.Bytes()
 	for _, line := range bytes.Split(stdout.Bytes(), []byte("\n")) {
 		if len(line) == 0 {
 			break
@@ -153,19 +152,20 @@ func (e *Endpoint) execResponse(r *types.Request) *types.Response {
 		}
 		resp.Headers[string(parts[0])] = string(parts[1])
 	}
-
-	// Add body
-	resp.Body = stdout.Bytes()
-
-	// Add status code
-	exitCode := cmd.ProcessState.ExitCode()
-	if exitCode < 0 || exitCode >= len(data.StatusCodes) {
+	status, body, ok := strings.Cut(stdout.String(), "\n")
+	if !ok {
 		resp.Status = 500
 		resp.Body = append(stderr.Bytes(), stdout.Bytes()...)
 		return resp
 	}
-	resp.Status = data.StatusCodes[exitCode]
-
+	statusCode, err := strconv.Atoi(status)
+	if err != nil {
+		resp.Status = 500
+		resp.Body = append(stderr.Bytes(), stdout.Bytes()...)
+		return resp
+	}
+	resp.Status = statusCode
+	resp.Body = []byte(body)
 	return resp
 }
 
