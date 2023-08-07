@@ -1,6 +1,7 @@
 package types
 
 type Runtime struct {
-	FileName  string
-	CmdPrefix []string
+	FileName      string
+	CompilePrefix []string
+	RunPrefix     []string
 }

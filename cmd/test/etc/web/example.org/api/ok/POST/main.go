@@ -1,5 +1,7 @@
 package main
 
+import "github.com/mikerybka/web"
+
 func main() {
-	fmt.Println("ok")
+	web.Return(200, "ok")
 }
