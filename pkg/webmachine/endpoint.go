@@ -125,7 +125,7 @@ func (e *Endpoint) execResponse(r *types.Request) *types.Response {
 	}
 	path := filepath.Join(e.Filepath, r.Method, rt.FileName)
 	command = append([]string{path}, command...)
-	command = append(rt.CmdPrefix, command...)
+	command = append(rt.RunPrefix, command...)
 
 	// Run command
 	cmd := exec.Command(command[0], command[1:]...)
