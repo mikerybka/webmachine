@@ -20,6 +20,8 @@ func main() {
 	flag.Parse()
 	command := flag.Arg(0)
 	switch command {
+	case "init":
+		// TODO
 	case "dev":
 		server := webmachine.Server{
 			Dir:     dir,
