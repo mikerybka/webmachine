@@ -26,6 +26,7 @@ func main() {
 		server := webmachine.Server{
 			Dir:     dir,
 			DevMode: true,
+			Logging: true,
 		}
 		browser.OpenURL("http://localhost:3000")
 		err := http.ListenAndServe(":3000", &server)
@@ -52,7 +53,8 @@ func main() {
 		return
 	case "serve":
 		server := webmachine.Server{
-			Dir: "/etc/web",
+			Dir:     "/etc/web",
+			Logging: true,
 		}
 		var email string
 		if len(os.Args) >= 3 {

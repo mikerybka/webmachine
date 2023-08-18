@@ -14,11 +14,14 @@ type Server struct {
 	Dir     string
 	Args    map[string]string
 	DevMode bool
+	Logging bool
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req := types.NewRequest(r)
-	req.Log(os.Stdout)
+	if s.Logging {
+		req.Log(os.Stdout)
+	}
 	path := s.path(r)
 	endpoint, err := s.endpoint(path, r.Method)
 	if errors.Is(err, os.ErrNotExist) {
@@ -30,7 +33,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	res := endpoint.Handle(req)
 	res.Write(w)
-	res.Log(os.Stdout)
+	if s.Logging {
+		res.Log(os.Stdout)
+	}
 }
 
 func (s *Server) path(r *http.Request) string {

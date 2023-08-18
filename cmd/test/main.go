@@ -17,7 +17,8 @@ func check(err error) {
 func main() {
 	// Create the server
 	server := webmachine.Server{
-		Dir: "cmd/test/etc/web",
+		Dir:     "pkg/tests/etc/web",
+		DevMode: true,
 	}
 
 	// Start the server
