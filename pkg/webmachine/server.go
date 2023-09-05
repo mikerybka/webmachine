@@ -74,7 +74,7 @@ func (s *Server) endpoint(path, method string) (*Endpoint, error) {
 			}
 
 			// If there is an exact match
-			if entry.Name() == p[0] {
+			if entry.Name() == p[0] && !entry.IsDir() {
 				newDir := filepath.Join(s.Dir, entry.Name())
 				s := Server{Dir: newDir, Args: s.Args}
 				return s.endpoint(paths.Join(p[1:]), method)
