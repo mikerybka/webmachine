@@ -3,6 +3,8 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8 h1:4obIhTUmejXtNoHZDKqO5Pog3LGrj+uVYvN04CvKD+A=
 github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8/go.mod h1:cfUnOBc6HUzZSYdGypqYqHJ1bVJmiWu4JydPs8kC1l8=
+github.com/mikerybka/util v0.0.0-20230906182941-b889b43a0e59 h1:pN0q2q3DV40CoOS2LyipyKdLx+2jotnTuFZ7iJji1Es=
+github.com/mikerybka/util v0.0.0-20230906182941-b889b43a0e59/go.mod h1:8AtaqMZHX+4gUnUx47g3lfzcZiGON1zAz+VaBxmi7pg=
 github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 h1:KoWmjvw+nsYOo29YJK9vDA65RGE3NrOnUtO7a+RF9HU=
 github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8/go.mod h1:HKlIX3XHQyzLZPlr7++PzdhaXEj94dEiJgZDTsxEqUI=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

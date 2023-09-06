@@ -1,8 +1,6 @@
 module github.com/mikerybka/webmachine
 
-go 1.21rc2
-
-toolchain go1.21.0
+go 1.21.0
 
 require (
 	github.com/mikerybka/paths v0.0.0-20230718152545-527b93f8c6b8
@@ -11,6 +9,7 @@ require (
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/mikerybka/util v0.0.0-20230906182941-b889b43a0e59 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 )

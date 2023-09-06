@@ -8,7 +8,9 @@ import (
 )
 
 type Runtime struct {
-	InitScript string
+	InitScript        string
+	InstallDepsScript string
+	AddDepScript      string
 }
 
 func (r *Runtime) Init() error {
