@@ -1,6 +1,6 @@
 package util
 
-import "github.com/mikerybka/apps/pkg/web/types"
+import "github.com/mikerybka/webmachine/pkg/types"
 
 type JSONStore[T any] struct {
 	Dir string

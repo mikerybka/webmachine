@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mikerybka/web/util"
 	"github.com/mikerybka/webmachine/pkg/data"
 	"github.com/mikerybka/webmachine/pkg/types"
+	"github.com/mikerybka/webmachine/pkg/util"
 )
 
 type Endpoint struct {

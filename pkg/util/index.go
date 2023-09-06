@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/mikerybka/apps/pkg/web/types"
+	"github.com/mikerybka/webmachine/pkg/types"
 )
 
 type Index struct {
