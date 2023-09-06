@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/mikerybka/webmachine/pkg/webmachine"
 	"github.com/pkg/browser"
@@ -15,57 +17,89 @@ import (
 func usage() {}
 
 func main() {
-	var dir string
-	flag.StringVar(&dir, "dir", ".", "Use this directory as the root of the web server")
-	flag.Parse()
-	command := flag.Arg(0)
+	command := os.Args[1]
 	switch command {
 	case "init":
-		// TODO
+		cmdInit()
 	case "dev":
-		server := webmachine.Server{
-			Dir:     dir,
-			DevMode: true,
-			Logging: true,
-		}
-		browser.OpenURL("http://localhost:3000")
-		err := http.ListenAndServe(":3000", &server)
-		if err != nil {
-			panic(err)
-		}
-		return
+		cmdDev()
 	case "deploy":
-		cmd := exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "/etc/web/")
-
-		remoteHostname := flag.Arg(1)
-		if remoteHostname != "" {
-			cmd = exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "root@"+remoteHostname+":/etc/web/")
-		}
-
-		cmd.Env = os.Environ()
-		cmd.Dir = dir
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			panic(err)
-		}
-		return
+		cmdDeploy()
 	case "serve":
-		server := webmachine.Server{
-			Dir:     "/etc/web",
-			Logging: true,
-		}
-		var email string
-		if len(os.Args) >= 3 {
-			email = os.Args[2]
-		}
-		err := serveHTTPS(&server, email, "/etc/certs")
-		if err != nil {
-			panic(err)
-		}
+		cmdServe()
 	default:
 		usage()
+	}
+}
+
+func cmdInit() {
+	flag.Parse()
+	name := flag.Arg(1)
+	var runtimesString string = flag.Arg(2)
+	runtimes := []*webmachine.Runtime{}
+	for _, id := range strings.Split(runtimesString, ",") {
+		rt, ok := webmachine.Runtimes[id]
+		if ok {
+			runtimes = append(runtimes, rt)
+		} else if id != "" {
+			fmt.Println("Unknown runtime ID:", id)
+		}
+	}
+
+	if name == "" {
+		flag.Usage()
+		return
+	}
+
+	err := webmachine.Init(name, runtimes)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func cmdDev() {
+	server := webmachine.Server{
+		Dir:     ".",
+		DevMode: true,
+		Logging: true,
+	}
+	browser.OpenURL("http://localhost:3000")
+	err := http.ListenAndServe(":3000", &server)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func cmdDeploy() {
+	cmd := exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "/etc/web/")
+
+	remoteHostname := flag.Arg(1)
+	if remoteHostname != "" {
+		cmd = exec.Command("rsync", "-avz", "--delete", "--exclude", ".git", ".", "root@"+remoteHostname+":/etc/web/")
+	}
+
+	cmd.Env = os.Environ()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func cmdServe() {
+	server := webmachine.Server{
+		Dir:     "/etc/web",
+		Logging: true,
+	}
+	var email string
+	if len(os.Args) >= 3 {
+		email = os.Args[2]
+	}
+	err := serveHTTPS(&server, email, "/etc/certs")
+	if err != nil {
+		panic(err)
 	}
 }
 
