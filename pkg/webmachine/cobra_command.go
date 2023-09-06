@@ -1,4 +1,4 @@
-package main
+package webmachine
 
 import (
 	"context"
@@ -9,43 +9,67 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/mikerybka/webmachine/pkg/webmachine"
 	"github.com/pkg/browser"
+	"github.com/spf13/cobra"
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func usage() {}
-
-func main() {
-	err := webmachine.CobraCommand.Execute()
-	if err != nil {
-		panic(err)
-	}
+var CobraCommand *cobra.Command = &cobra.Command{
+	Use:   "webmachine",
+	Short: "webmachine is a tool for building web apps",
+	Long:  `webmachine is a tool for building web apps.`,
 }
 
-// func main() {
-// 	command := os.Args[1]
-// 	switch command {
-// 	case "init":
-// 		cmdInit()
-// 	case "dev":
-// 		cmdDev()
-// 	case "deploy":
-// 		cmdDeploy()
-// 	case "serve":
-// 		cmdServe()
-// 	default:
-// 		usage()
-// 	}
-// }
+func init() {
+	CobraCommand.AddCommand(initCommand)
+	CobraCommand.AddCommand(devCommand)
+	CobraCommand.AddCommand(serveCommand)
+	CobraCommand.AddCommand(deployCommand)
+}
+
+var initCommand *cobra.Command = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize a new webmachine project",
+	Long:  `Initialize a new webmachine project.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmdInit()
+	},
+}
+
+var devCommand *cobra.Command = &cobra.Command{
+	Use:   "dev",
+	Short: "Run a development server",
+	Long:  `Run a development server.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmdDev()
+	},
+}
+
+var serveCommand *cobra.Command = &cobra.Command{
+	Use:   "serve",
+	Short: "Start a production server",
+	Long:  `Start a production server.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmdServe()
+	},
+}
+
+var deployCommand *cobra.Command = &cobra.Command{
+	Use:   "deploy",
+	Short: "Deploy to a production server",
+	Long:  `Deploy to a production server.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cmdDeploy()
+	},
+}
 
 func cmdInit() {
 	flag.Parse()
 	name := flag.Arg(1)
 	var runtimesString string = flag.Arg(2)
-	runtimes := []*webmachine.Runtime{}
+	runtimes := []*Runtime{}
 	for _, id := range strings.Split(runtimesString, ",") {
-		rt, ok := webmachine.Runtimes[id]
+		rt, ok := Runtimes[id]
 		if ok {
 			runtimes = append(runtimes, rt)
 		} else if id != "" {
@@ -58,7 +82,7 @@ func cmdInit() {
 		return
 	}
 
-	err := webmachine.Init(name, runtimes)
+	err := Init(name, runtimes)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -66,7 +90,7 @@ func cmdInit() {
 }
 
 func cmdDev() {
-	server := webmachine.Server{
+	server := Server{
 		Dir:     ".",
 		DevMode: true,
 		Logging: true,
@@ -96,7 +120,7 @@ func cmdDeploy() {
 }
 
 func cmdServe() {
-	server := webmachine.Server{
+	server := Server{
 		Dir:     "/etc/web",
 		Logging: true,
 	}
