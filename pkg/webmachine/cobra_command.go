@@ -49,7 +49,11 @@ var serveCommand *cobra.Command = &cobra.Command{
 	Short: "Start a production server",
 	Long:  `Start a production server.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmdServe()
+		email := ""
+		if len(args) > 1 {
+			email = args[1]
+		}
+		cmdServe(email)
 	},
 }
 
@@ -118,12 +122,11 @@ func cmdDeploy() {
 	}
 }
 
-func cmdServe() {
+func cmdServe(email string) {
 	server := Server{
 		Dir:     "/etc/web",
 		Logging: true,
 	}
-	var email string
 	err := util.ServeHTTPS(&server, email, "/etc/certs")
 	if err != nil {
 		panic(err)

@@ -1,7 +1,6 @@
-FROM ubuntu:23.04
+FROM fedora:latest
 
-RUN apt update
-RUN apt install -y curl wget
+RUN dnf install -y wget
 
 # TODO: install python, ruby, node, etc.
 
